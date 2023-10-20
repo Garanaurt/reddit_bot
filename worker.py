@@ -13,6 +13,7 @@ from fake_useragent import UserAgent
 import random
 from rq import get_current_job
 import redis
+from selenium.webdriver.chrome.service import Service
 from create_db import db
 
 
@@ -41,19 +42,23 @@ class RedditBot:
         proxy_port = 3003
         user_agent = ua.random
         chrome_options = Options()
-        chrome_options.add_argument(f'--proxy-server={proxy_server}:{proxy_port}')
+        #chrome_options.binary_location = "/usr/bin/google-chrome"
+        chromedriver_path = '/usr/bin/chromedriver'
+        #chrome_options.add_argument(f'--proxy-server={proxy_server}:{proxy_port}')
         chrome_options.add_argument("--lang=en")
-        chrome_options.add_argument("--blink-settings=imagesEnabled=false")
+        #chrome_options.add_argument("--blink-settings=imagesEnabled=false")
         #chrome_options.add_argument("--headless")
         chrome_options.add_argument("user-agent=" + user_agent)
-        chrome_options.add_argument("--disable-notifications")
-        chrome_options.add_argument("--start-maximized")
+        chrome_options.add_argument("--no-sandbox")
+
+        #chrome_options.add_argument("--disable-notifications")
+        #chrome_options.add_argument("--start-maximized")
         ChromeDriverManager().install()
 
 
         
         self.link = link
-        self.driver = webdriver.Chrome(options=chrome_options)
+        self.driver = webdriver.Chrome(service=Service(executable_path=chromedriver_path),options=chrome_options)
         self.wait = WebDriverWait(self.driver, 10)
         
         self.sleep_timer = random.randint(100, 999) / 1000
